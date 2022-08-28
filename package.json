@@ -1,0 +1,25 @@
+{
+  "name": "casestudymodule3",
+  "version": "1.0.0",
+  "dependencies": {
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.19",
+    "qs": "^6.11.0",
+    "socket.io": "^4.5.1"
+  },
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "description": "Project: Web ban hang phu kien game thu",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kienbui195/Real-Case-Study-M3.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kienbui195/Real-Case-Study-M3/issues"
+  },
+  "homepage": "https://github.com/kienbui195/Real-Case-Study-M3#readme"
+}
