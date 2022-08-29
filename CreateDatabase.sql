@@ -40,9 +40,10 @@ values ('Laptop Acer', 1000, 100, 'Laptop Acer siêu đỉnh cao'),
        ('PC Gaming Siêu Cao cấp', 500, 50, 'Máy tínhsiêu cao cấp');
 
 DELIMITER //
-CREATE PROCEDURE isEmail(IN emailInput VARCHAR(255), @flag BOOLEAN)
+CREATE PROCEDURE isEmail(IN emailInput VARCHAR(255), OUT valueOutput VARCHAR(255))
 BEGIN
-    SELECT email FROM customer WHERE email = emailInput;
+    SET valueOutput = (SELECT email FROM customer WHERE email = emailInput);
+    SELECT @valueOutput;
 end //
 DELIMITER ;
 
@@ -58,3 +59,4 @@ values ('thogawa', 'ddtho95@gmail.com', 'Thogia123', 'admin'),
 
 INSERT INTO users(name,email,password,role)
 values ('Thứ', 'thu@gmail.com', '123456', 'customer')
+
