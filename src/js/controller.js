@@ -1,5 +1,6 @@
 const fs = require('fs');
 const connection = require('../js/connecttoDatabase.js');
+const localStorage = require('local-storage');
 
 class Controller {
     constructor() {
@@ -10,6 +11,18 @@ class Controller {
         res.writeHead(200, {'Content-Type' : 'text/html'});
         res.write(data);
         res.end();
+    }
+
+    checkSession(req, res) {
+        let tokenID = localStorage.get('token');
+        if (tokenID) {
+            let sessionString = '';
+            let session = fs.readFileSync('./templates/' + tokenID, 'utf8');
+            sessionString = String(session);
+            this.home(req, res);
+        }else{
+            this.login(req, res);
+        }
     }
 
     home(req, res) {
@@ -35,8 +48,6 @@ class Controller {
             })
         })
     }
-
-
 
     notFound(req, res) {
         let data = fs.readFileSync('./templates/notFound.html', "utf-8");

@@ -28,6 +28,9 @@ const httpServer = http.createServer((req, res) => {
 
     switch (path) {
         case '/':
+            controller.checkSession(req, res);
+            break;
+        case '/home':
             controller.home(req, res);
             break;
         case '/login':
