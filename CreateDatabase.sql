@@ -47,4 +47,16 @@ BEGIN
 end //
 DELIMITER ;
 
+alter table customer
+rename to users;
+
+ALTER TABLE users
+ADD role varchar(40);
+
+INSERT INTO users(name,email,password,role)
+values ('thogawa', 'ddtho95@gmail.com', 'Thogia123', 'admin'),
+       ('Ken', 'ken@gmail.com', '123456', 'admin');
+
+INSERT INTO users(name,email,password,role)
+values ('Thứ', 'thu@gmail.com', '123456', 'customer')
 
