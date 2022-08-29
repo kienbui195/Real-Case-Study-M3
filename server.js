@@ -27,7 +27,7 @@ const httpServer = http.createServer((req, res) => {
     const path = req.url;
 
     switch (path) {
-        case '/':
+        case '/home':
             controller.home(req, res);
             break;
         case '/login':

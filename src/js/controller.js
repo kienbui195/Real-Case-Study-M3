@@ -2,7 +2,6 @@ const fs = require('fs');
 const mysql = require('mysql');
 const connection = require('../js/connecttoDatabase.js');
 const qs = require("qs");
-const connectDatabase = require("./connecttoDatabase");
 
 class Controller {
 
@@ -76,9 +75,14 @@ class Controller {
             req.on('end' , () => {
                 let newData = qs.parse(data);
                 connection.connect(() => {
-
+                    let sql = `CALL isEmail('${newData.email}', @flag)`;
+                    connection.query(sql, (err, result) => {
+                        if (result.affectedRows > 0) {
+                            res.writeHead(301 , {'Location' : '/register'})
+                            res.end();
+                        }
+                    })
                 })
-
                 if (newData.newPassword === newData.newRepeatPassword) {
                     let newUser = {
                         name: newData.newName,
@@ -94,10 +98,9 @@ class Controller {
                             }
                         })
                     })
-                    res.writeHead(301, {'Location' : '/'});
+                    res.writeHead(301, {'Location' : '/home'});
                     res.end();
                 }
-
                 res.writeHead(301, {'Location' : '/register'})
                 res.end();
             })
