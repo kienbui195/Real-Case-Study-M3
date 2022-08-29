@@ -31,3 +31,11 @@ CREATE TABLE IF NOT EXISTS OrderDetails (
     FOREIGN KEY (pro_id) REFERENCES Product(pro_id)
 );
 
+insert into product(name, price,quantityInStock,description)
+values ('Laptop Acer', 1000, 100, 'Laptop Acer siêu đỉnh cao'),
+       ('Laptop HP', 1200, 200, 'Laptop HP siêu đẳng cấp'),
+       ('Macbook', 1500, 150, 'Macbook Pro M2 2022'),
+       ('PC Gaming Trung cấp', 800, 50, 'Máy tính tầm trung'),
+       ('PC Gaming Cao cấp', 2000, 50, 'Máy tính cao cấp'),
+       ('PC Gaming Siêu Cao cấp', 500, 50, 'Máy tínhsiêu cao cấp')
+

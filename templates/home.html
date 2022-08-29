@@ -1,125 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>ThoKen Home Page</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <style>
-        /* Remove the navbar's default margin-bottom and rounded borders */
-        .navbar {
-            margin-bottom: 0;
-            border-radius: 0;
-        }
-
-        /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
-        .row.content {height: 450px}
-
-        /* Set gray background color and 100% height */
-        .sidenav {
-            padding-top: 20px;
-            background-color: #f1f1f1;
-            height: 100%;
-        }
-
-        /* On small screens, set height to 'auto' for sidenav and grid */
-        @media screen and (max-width: 767px) {
-            .sidenav {
-                height: auto;
-                padding: 15px;
-            }
-            .row.content {height:auto;}
-        }
-    </style>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
 </head>
 <body>
-
-<nav class="navbar navbar-inverse">
+<nav class="navbar navbar-expand-lg" style="background-color: #e3f2fd;">
     <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">Logo</a>
-        </div>
-        <div class="collapse navbar-collapse" id="myNavbar">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Projects</a></li>
-                <li><a href="#">Contact</a></li>
+        <a class="navbar-brand" href="#">ThoKen</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://hacom.vn">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Giỏ hàng</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Chat</a>
+                </li>
             </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-            </ul>
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
         </div>
     </div>
 </nav>
-
-<div class="container-fluid text-center">
-    <div class="row content">
-        <div class="col-sm-2 sidenav">
-            <p><a href="#">Link</a></p>
-            <p><a href="#">Link</a></p>
-            <p><a href="#">Link</a></p>
-        </div>
-        <div class="col-sm-8 text-left">
-            <h1>Welcome</h1>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-            <hr>
-            <h3>Test</h3>
-            <p>Lorem ipsum...</p>
-        </div>
-        <div class="col-sm-2 sidenav">
-            <div class="well">
-                <p>ADS</p>
-            </div>
-            <div class="well">
-                <p>ADS</p>
-            </div>
-        </div>
-    </div>
-</div>
+<h1>Danh sách sản phẩm</h1>
+<table class="table">
+    <thead class="table-primary">
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Tên sản phẩm</th>
+        <th scope="col">Giá</th>
+        <th scope="col">Số lượng tồn kho</th>
+        <th scope="col">Mô tả</th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>
+    {ListProduct}
+    </tbody>
+</table>
 
 <!-- Footer -->
-<footer class="text-center text-lg-start bg-white text-muted">
-    <!-- Section: Social media -->
-    <section class="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
-        <!-- Left -->
-        <div class="me-5 d-none d-lg-block">
-            <span>Get connected with us on social networks:</span>
-        </div>
-        <!-- Left -->
-
-        <!-- Right -->
-        <div>
-            <a href="" class="me-4 link-grayish">
-                <i class="fab fa-facebook-f"></i>
-            </a>
-            <a href="" class="me-4 link-grayish">
-                <i class="fab fa-twitter"></i>
-            </a>
-            <a href="" class="me-4 link-grayish">
-                <i class="fab fa-google"></i>
-            </a>
-            <a href="" class="me-4 link-grayish">
-                <i class="fab fa-instagram"></i>
-            </a>
-            <a href="" class="me-4 link-grayish">
-                <i class="fab fa-linkedin"></i>
-            </a>
-            <a href="" class="me-4 link-grayish">
-                <i class="fab fa-github"></i>
-            </a>
-        </div>
-        <!-- Right -->
-    </section>
-    <!-- Section: Social media -->
-
+<footer class="text-center text-lg-start bg-white text-muted ">
     <!-- Section: Links  -->
     <section class="">
         <div class="container text-center text-md-start mt-5">
@@ -129,11 +65,10 @@
                 <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
                     <!-- Content -->
                     <h6 class="text-uppercase fw-bold mb-4">
-                        <i class="fas fa-gem me-3 text-grayish"></i>Company name
+                        <i class="fas fa-gem me-3 text-grayish"></i>ThoKen Shop
                     </h6>
                     <p>
-                        Here you can use rows and columns to organize your footer content. Lorem ipsum
-                        dolor sit amet, consectetur adipisicing elit.
+                        Công ty chúng tôi chuyên buôn bán người sang Trung Quốc với giá phải chăng
                     </p>
                 </div>
                 <!-- Grid column -->
@@ -153,9 +88,6 @@
                     <p>
                         <a href="#!" class="text-reset">Vue</a>
                     </p>
-                    <p>
-                        <a href="#!" class="text-reset">Laravel</a>
-                    </p>
                 </div>
                 <!-- Grid column -->
 
@@ -165,9 +97,6 @@
                     <h6 class="text-uppercase fw-bold mb-4">
                         Useful links
                     </h6>
-                    <p>
-                        <a href="#!" class="text-reset">Pricing</a>
-                    </p>
                     <p>
                         <a href="#!" class="text-reset">Settings</a>
                     </p>
@@ -187,10 +116,9 @@
                     <p><i class="fas fa-home me-3 text-grayish"></i> New York, NY 10012, US</p>
                     <p>
                         <i class="fas fa-envelope me-3 text-grayish"></i>
-                        info@example.com
+                        info@thoken.com
                     </p>
                     <p><i class="fas fa-phone me-3 text-grayish"></i> + 01 234 567 88</p>
-                    <p><i class="fas fa-print me-3 text-grayish"></i> + 01 234 567 89</p>
                 </div>
                 <!-- Grid column -->
             </div>
@@ -208,5 +136,9 @@
 </footer>
 <!-- Footer -->
 
+<!-- JavaScript Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+        crossorigin="anonymous"></script>
 </body>
 </html>
