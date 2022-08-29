@@ -20,7 +20,7 @@ class Controller {
             req.on('end', () => {
                 let newData = qs.parse(data);
                 connection.connect(()=>{
-                    let sql = `SELECT role from users WHERE email = '${newData.email}'`;
+                    let sql = `SELECT * from users WHERE email = '${newData.email}'`;
                     connection.query(sql, (err, results) => {
                         if(results.length > 0) {
                             if(results[0].role === 'admin' && results[0].password === newData.password){
@@ -111,27 +111,34 @@ class Controller {
             });
             req.on('end' , () => {
                 let newData = qs.parse(data);
-                if (newData.newPassword === newData.newRepeatPassword) {
-                    let newUser = {
-                        name: newData.newName,
-                        email: newData.newEmail,
-                        password: newData.newPassword,
-                        role : 'customer'
-                    }
-                    connection.connect(() => {
-                        console.log(`Connect success`)
-                        const sql = `INSERT INTO customer (name, email, password, role) VALUES ('${newUser.name}','${newUser.email}','${newUser.password}', '${newUser.role}');`
-                        connection.query(sql, (err) => {
-                            if (err) {
-                                console.log(err)
+                connection.connect(() => {
+                    let flag = false;
+                    const sql = `SELECT * FROM users WHERE email = '${newData.newEmail}'`
+                    connection.query(sql, (err, result) => {
+                        if (result.length > 0) {
+                            flag = true;
+                        }
+                        if (newData.newPassword === newData.newRepeatPassword && flag === false) {
+                            let newUser = {
+                                name: newData.newName,
+                                email: newData.newEmail,
+                                password: newData.newPassword,
+                                role : 'customer'
                             }
-                        })
+                            const sql = `INSERT INTO users (name, email, password, role) VALUES ('${newUser.name}','${newUser.email}','${newUser.password}', '${newUser.role}');`
+                            connection.query(sql, (err) => {
+                                if (err) {
+                                    console.log(err)
+                                }
+                            })
+                            res.writeHead(301, {'Location' : '/login'});
+                            res.end();
+                        } else {
+                            res.writeHead(301, {'Location' : '/register'});
+                            res.end();
+                        }
                     })
-                    res.writeHead(301, {'Location' : '/login'});
-                    res.end();
-                }
-                res.writeHead(301, {'Location' : '/register'})
-                res.end();
+                })
             })
         }
     }
