@@ -27,6 +27,9 @@ const httpServer = http.createServer((req, res) => {
     const path = req.url;
 
     switch (path) {
+        case '/':
+            controller.checkSession(req, res);
+            break;
         case '/home':
             controller.home(req, res);
             break;
@@ -38,6 +41,9 @@ const httpServer = http.createServer((req, res) => {
             break;
         case '/chat':
             controller.chat(req, res);
+            break;
+        case '/dashboard':
+            controller.dashboard(req, res);
             break;
         default:
             controller.notFound(req, res);
