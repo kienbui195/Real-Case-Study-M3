@@ -37,5 +37,12 @@ values ('Laptop Acer', 1000, 100, 'Laptop Acer siêu đỉnh cao'),
        ('Macbook', 1500, 150, 'Macbook Pro M2 2022'),
        ('PC Gaming Trung cấp', 800, 50, 'Máy tính tầm trung'),
        ('PC Gaming Cao cấp', 2000, 50, 'Máy tính cao cấp'),
-       ('PC Gaming Siêu Cao cấp', 500, 50, 'Máy tínhsiêu cao cấp')
+       ('PC Gaming Siêu Cao cấp', 500, 50, 'Máy tínhsiêu cao cấp');
+
+DELIMITER //
+CREATE PROCEDURE isEmail(IN emailInput VARCHAR(255), @flag BOOLEAN)
+BEGIN
+    SELECT email FROM customer WHERE email = emailInput;
+end //
+DELIMITER ;
 

@@ -34,15 +34,15 @@
                   <div class="d-flex flex-row align-items-center mb-4">
                     <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
                     <div class="form-outline flex-fill mb-0">
-                      <input type="password" id="form3Example4c" class="form-control" name="newPassword"/>
-                      <label class="form-label" for="form3Example4c">Password</label>
+                      <input type="password" id="inputPassword" class="form-control" name="newPassword"/>
+                      <label class="form-label" for="inputPassword">Password</label>
                     </div>
                   </div>
                   <div class="d-flex flex-row align-items-center mb-4">
                     <i class="fas fa-key fa-lg me-3 fa-fw"></i>
                     <div class="form-outline flex-fill mb-0">
-                      <input type="password" id="form3Example4cd" class="form-control" name="newRepeatPassword" />
-                      <label class="form-label" for="form3Example4cd">Repeat your password</label>
+                      <input type="password" id="inputPasswordRepeat" class="form-control" name="newRepeatPassword" />
+                      <label class="form-label" for="inputPasswordRepeat">Repeat your password</label>
                     </div>
                   </div>
                   <div class="form-check d-flex justify-content-center mb-5">
@@ -52,7 +52,7 @@
                     </label>
                   </div>
                   <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                    <button type="submit" class="btn btn-primary btn-lg">Register</button>
+                    <button type="submit" class="btn btn-primary btn-lg"  onclick="checkPassword()">Register</button>
                   </div>
                 </form>
               </div>
@@ -67,7 +67,15 @@
     </div>
   </div>
 </section>
-
+<script>
+    let  checkPassword = () => {
+        let pass1 = document.getElementById('inputPassword');
+        let pass2 = document.getElementById('inputPasswordRepeat');
+        if (pass1.value !== pass2.value) {
+          alert('Mật khẩu không trùng khớp! Mời nhập lại');
+        }
+    }
+</script>
 <!-- JavaScript Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
 </body>

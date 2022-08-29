@@ -37,11 +37,21 @@ const httpServer = http.createServer((req, res) => {
             controller.login(req, res);
             break;
         case '/register':
+            controller.register(req, res);
+            break;
+        case '/chat':
+            controller.chat(req, res);
             break;
         default:
             controller.notFound(req, res);
             break;
     }
-}).listen(port, 'localhost', () => {
-    console.log(`Server is running at http:localhost:${port}`);
+})
+
+
+
+
+    httpServer.listen(port, 'localhost', () => {
+    console.log(`Server is running at http://localhost:${port}`);
 });
+
