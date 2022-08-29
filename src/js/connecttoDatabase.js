@@ -8,8 +8,4 @@ const connection = mysql.createConnection({
     database: "CaseM3"
 });
 
-connection.connect(() => {
-    console.log("Connected to database");
-})
-
 module.exports = connection;
