@@ -1,8 +1,8 @@
 const fs = require('fs');
 const mysql = require('mysql');
 const connection = require('../js/connecttoDatabase.js');
+const localStorage = require('local-storage');
 const qs = require("qs");
-const connectDatabase = require("./connecttoDatabase");
 
 class Controller {
 
@@ -21,6 +21,18 @@ class Controller {
                 let newData = qs.parse(data);
 
             })
+        }
+    }
+
+    checkSession(req, res) {
+        let tokenID = localStorage.get('token');
+        if (tokenID) {
+            let sessionString = '';
+            let session = fs.readFileSync('./templates/' + tokenID, 'utf8');
+            sessionString = String(session);
+            this.home(req, res);
+        }else{
+            this.login(req, res);
         }
     }
 
