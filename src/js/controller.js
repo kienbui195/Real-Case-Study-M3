@@ -19,7 +19,31 @@ class Controller {
             });
             req.on('end', () => {
                 let newData = qs.parse(data);
+                connection.connect(()=>{
+                    let sql = `SELECT role from users WHERE email = '${newData.email}'`;
+                    connection.query(sql, (err, results) => {
+                        if(results.length > 0) {
+                            if(results[0].role === 'admin' && results[0].password === newData.password){
+                                res.writeHead(301, {'Location': '/dashboard'})
+                                res.end();
+                            }else if(results[0].role === 'customer' && results[0].password === newData.password) {
+                                let tokenId = Date.now();
+                                let tokenSession = `{email:${newData.email}, password:${newData.password}`;
+                                fs.writeFileSync('./token/'+tokenId, tokenSession);
+                                localStorage.set('token', tokenId);
+                                res.writeHead(301, {'Location' : '/home'})
+                                res.end();
+                            }else {
+                                res.writeHead(301, {'Location' : '/login'})
+                                res.end();
+                            }
+                        }else {
+                            res.writeHead(301, {'Location' : '/login'})
+                            res.end();
+                        }
 
+                    });
+                })
             })
         }
     }
@@ -95,18 +119,19 @@ class Controller {
                     let newUser = {
                         name: newData.newName,
                         email: newData.newEmail,
-                        password: newData.newPassword
+                        password: newData.newPassword,
+                        role : 'customer'
                     }
                     connection.connect(() => {
                         console.log(`Connect success`)
-                        const sql = `INSERT INTO customer (name, email, password) VALUES ('${newUser.name}','${newUser.email}','${newUser.password}');`
+                        const sql = `INSERT INTO customer (name, email, password, role) VALUES ('${newUser.name}','${newUser.email}','${newUser.password}', '${newUser.role}');`
                         connection.query(sql, (err) => {
                             if (err) {
                                 console.log(err)
                             }
                         })
                     })
-                    res.writeHead(301, {'Location' : '/'});
+                    res.writeHead(301, {'Location' : '/login'});
                     res.end();
                 }
 
