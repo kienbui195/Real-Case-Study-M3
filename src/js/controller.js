@@ -1,6 +1,8 @@
 const fs = require('fs');
 const mysql = require('mysql');
 const connection = require('../js/connecttoDatabase.js');
+const qs = require("qs");
+const connectDatabase = require("./connecttoDatabase");
 
 class Controller {
 
@@ -73,28 +75,33 @@ class Controller {
             });
             req.on('end' , () => {
                 let newData = qs.parse(data);
-                if (newData.password === newData.newRepeatPassword) {
-                    let newUser = {
-                        name: newData.name,
-                        email: newData.email,
-                        password: newData.password
-                    }
+                connection.connect(() => {
 
-                    connection.connect()
-                    // connectDatabase();
-                    // const sql = `INSERT TABLE (name, email, password) VALUES (${newUser.name},${newUser.email},${newUser.password})`
-                    // connection.query(sql, (err, result) => {
-                    //     if (err) {
-                    //         console.log(err)
-                    //     }
-                    // })
-                    res.writeHead(301, {'Location' : '/home'});
+                })
+
+                if (newData.newPassword === newData.newRepeatPassword) {
+                    let newUser = {
+                        name: newData.newName,
+                        email: newData.newEmail,
+                        password: newData.newPassword
+                    }
+                    connection.connect(() => {
+                        console.log(`Connect success`)
+                        const sql = `INSERT INTO customer (name, email, password) VALUES ('${newUser.name}','${newUser.email}','${newUser.password}');`
+                        connection.query(sql, (err) => {
+                            if (err) {
+                                console.log(err)
+                            }
+                        })
+                    })
+                    res.writeHead(301, {'Location' : '/'});
                     res.end();
                 }
 
+                res.writeHead(301, {'Location' : '/register'})
+                res.end();
             })
         }
-
     }
 }
 
