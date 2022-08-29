@@ -26,6 +26,20 @@ class Controller {
         res.write(data);
         res.end();
     }
+
+    chat(req, res) {
+        let data = fs.readFileSync('./templates/chatting.html', 'utf-8');
+        res.writeHead(200, {'Content-Type' : 'text/html'});
+        res.write(data);
+        res.end();
+    }
+
+    register(req, res) {
+        let data = fs.readFileSync('./templates/register.html', 'utf-8');
+        res.writeHead(200, {'Content-Type' : 'text/html'});
+        res.write(data);
+        res.end();
+    }
 }
 
 module.exports = Controller;
