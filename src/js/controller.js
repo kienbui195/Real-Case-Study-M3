@@ -1,15 +1,27 @@
 const fs = require('fs');
+const mysql = require('mysql');
 const connection = require('../js/connecttoDatabase.js');
+const qs = require("qs");
+const connectDatabase = require("./connecttoDatabase");
 
 class Controller {
-    constructor() {
-    }
 
     login(req, res) {
-        let data = fs.readFileSync('./templates/login.html', 'utf8');
-        res.writeHead(200, {'Content-Type' : 'text/html'});
-        res.write(data);
-        res.end();
+        if (req.method === "GET") {
+            let data = fs.readFileSync('./templates/login.html', 'utf8');
+            res.writeHead(200, {'Content-Type' : 'text/html'});
+            res.write(data);
+            res.end();
+        } else {
+            let data = '';
+            req.on('data' , chunk => {
+                data += chunk;
+            });
+            req.on('end', () => {
+                let newData = qs.parse(data);
+
+            })
+        }
     }
 
     home(req, res) {
@@ -36,13 +48,60 @@ class Controller {
         })
     }
 
-
-
     notFound(req, res) {
         let data = fs.readFileSync('./templates/notFound.html', "utf-8");
         res.writeHead(200, {'Content-Type' : 'text/html'});
         res.write(data);
         res.end();
+    }
+
+    chat(req, res) {
+        let data = fs.readFileSync('./templates/chatting.html', 'utf-8');
+        res.writeHead(200, {'Content-Type' : 'text/html'});
+        res.write(data);
+        res.end();
+    }
+
+    register(req, res) {
+        if (req.method === "GET") {
+            let data = fs.readFileSync('./templates/register.html', 'utf-8');
+            res.writeHead(200, {'Content-Type' : 'text/html'});
+            res.write(data);
+            res.end();
+        } else {
+            let data = "";
+            req.on('data' , chunk => {
+                data += chunk;
+            });
+            req.on('end' , () => {
+                let newData = qs.parse(data);
+                connection.connect(() => {
+
+                })
+
+                if (newData.newPassword === newData.newRepeatPassword) {
+                    let newUser = {
+                        name: newData.newName,
+                        email: newData.newEmail,
+                        password: newData.newPassword
+                    }
+                    connection.connect(() => {
+                        console.log(`Connect success`)
+                        const sql = `INSERT INTO customer (name, email, password) VALUES ('${newUser.name}','${newUser.email}','${newUser.password}');`
+                        connection.query(sql, (err) => {
+                            if (err) {
+                                console.log(err)
+                            }
+                        })
+                    })
+                    res.writeHead(301, {'Location' : '/'});
+                    res.end();
+                }
+
+                res.writeHead(301, {'Location' : '/register'})
+                res.end();
+            })
+        }
     }
 }
 
