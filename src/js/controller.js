@@ -20,13 +20,15 @@ class Controller {
             req.on('end', () => {
                 let newData = qs.parse(data);
                 connection.connect(()=>{
-                    let sql = `SELECT role from users WHERE email = '${newData.email}'`;
+                    let sql = `SELECT * from users WHERE email = '${newData.email}'`;
                     connection.query(sql, (err, results) => {
+                        console.log(results[0].password);
+                        console.log(newData.password);
                         if(results.length > 0) {
-                            if(results[0].role === 'admin' && results[0].password === newData.password){
+                            if(results[0].role === 'admin' && results[0].password == newData.password){
                                 res.writeHead(301, {'Location': '/dashboard'})
                                 res.end();
-                            }else if(results[0].role === 'customer' && results[0].password === newData.password) {
+                            }else if(results[0].role === 'customer' && results[0].password == newData.password) {
                                 let tokenId = Date.now();
                                 let tokenSession = `{email:${newData.email}, password:${newData.password}`;
                                 fs.writeFileSync('./token/'+tokenId, tokenSession);
