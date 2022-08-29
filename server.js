@@ -42,6 +42,9 @@ const httpServer = http.createServer((req, res) => {
         case '/chat':
             controller.chat(req, res);
             break;
+        case '/dashboard':
+            controller.dashboard(req, res);
+            break;
         default:
             controller.notFound(req, res);
             break;
