@@ -25,12 +25,16 @@ const httpServer = http.createServer((req, res) => {
     }
 
     const urlPath = url.parse(req.url);
+
     switch (urlPath.pathname) {
         case '/':
             controller.checkSession(req, res);
             break;
         case '/home':
             controller.home(req, res);
+            break;
+        case '/addcart':
+            controller.addCart(req, res);
             break;
         case '/cart':
             controller.cart(req, res);
