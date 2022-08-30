@@ -233,7 +233,6 @@ class Controller {
             req.on('end', () => {
                 let newData = qs.parse(data);
                 connection.connect(() => {
-                    console.log(newData)
                     const sql = `INSERT INTO product (name, price, quantityInStock, description) VALUES ('${newData.nameProduct}',${+newData.priceProduct}, ${+newData.quantityProduct}, '${newData.description}')`
                     connection.query(sql, (err, result) => {
                         if (err) {
@@ -306,7 +305,6 @@ class Controller {
             connection.query(sql, (err, result) => {
                 let html = '';
                 if (result.length > 0) {
-                    console.log(result)
                     result.forEach((item, index) => {
                         html += '<tr>'
                         html += `<td>${index + 1}</td>`

@@ -39,14 +39,6 @@ values ('Laptop Acer', 1000, 100, 'Laptop Acer siêu đỉnh cao'),
        ('PC Gaming Cao cấp', 2000, 50, 'Máy tính cao cấp'),
        ('PC Gaming Siêu Cao cấp', 500, 50, 'Máy tínhsiêu cao cấp');
 
-DELIMITER //
-CREATE PROCEDURE isEmail(IN emailInput VARCHAR(255), OUT valueOutput VARCHAR(255))
-BEGIN
-    SET valueOutput = (SELECT email FROM customer WHERE email = emailInput);
-    SELECT @valueOutput;
-end //
-DELIMITER ;
-
 alter table customer
 rename to users;
 
