@@ -2,7 +2,10 @@ const fs = require('fs');
 const connection = require('../js/connecttoDatabase.js');
 const localStorage = require('local-storage');
 const qs = require("qs");
-const url = require('url');
+const url = require("url");
+
+let tokenId;
+
 
 class Controller {
 
@@ -22,17 +25,15 @@ class Controller {
                 connection.connect(()=>{
                     let sql = `SELECT * from users WHERE email = '${newData.email}'`;
                     connection.query(sql, (err, results) => {
-                        console.log(results[0].password);
-                        console.log(newData.password);
                         if(results.length > 0) {
                             if(results[0].role === 'admin' && results[0].password === newData.password){
                                 res.writeHead(301, {'Location': '/dashboard'})
                                 res.end();
                             }else if(results[0].role === 'customer' && results[0].password === newData.password) {
-                                let tokenId = Date.now();
-                                let tokenSession = `{email:${newData.email}, password:${newData.password}}`;
-                                fs.writeFileSync('./token/'+tokenId, tokenSession);
-                                localStorage.set('token', tokenId);
+                                tokenId = newData.email;
+                                let tokenSession = {email : newData.email, cart : []};
+                                fs.writeFileSync('./token/'+tokenId, JSON.stringify(tokenSession), 'utf8');
+                                localStorage.set(`${tokenId}`, tokenId);
                                 res.writeHead(301, {'Location' : '/home'})
                                 res.end();
                             }else {
@@ -50,11 +51,8 @@ class Controller {
     }
 
     checkSession(req, res) {
-        let tokenID = localStorage.get('token');
-        if (tokenID) {
-            let sessionString = '';
-            let session = fs.readFileSync('./token/' + tokenID, 'utf8');
-            sessionString = String(session);
+        let tokenId = localStorage.get('token');
+        if (tokenId) {
             this.home(req, res);
         }else{
             this.login(req, res);
@@ -73,10 +71,11 @@ class Controller {
                     html += `<td>${results[i].price}</td>`;
                     html += `<td>${results[i].quantityInStock}</td>`;
                     html += `<td>${results[i].description}</td>`;
-                    html += `<td><a href='/proid=${results[i].pro_id}' type="button" class="btn btn-success">Thêm vào giỏ hàng</a></td>`
+                    html += `<td><a href='/addcart?id=${results[i].pro_id}' type="button" class="btn btn-success">Thêm vào giỏ hàng</a></td>`
                     html += `</tr>`;
                 }
                 let data = fs.readFileSync('./templates/home.html', 'utf8');
+                res.setHeader('Cache-Control', 'no-store');
                 res.writeHead(200, {'Content-Type' : 'text/html'});
                 data = data.replace('{ListProduct}', html);
                 res.write(data);
@@ -85,11 +84,55 @@ class Controller {
         })
     }
 
-    cart(req, res) {
-        let data = fs.readFileSync('./templates/cart.html', "utf-8");
-        res.writeHead(200, {'Content-Type' : 'text/html'});
-        res.write(data);
+    addCart(req, res){
+        let session = fs.readFileSync('./token/' + tokenId, 'utf8');
+        let customerEmail = JSON.parse(session).email;
+        let customerCart = JSON.parse(session).cart;
+        let query = qs.parse(url.parse(req.url).query);
+        let productID = +query.id;
+        if(customerCart.indexOf(productID) === -1){
+            customerCart.push(productID);
+        }
+        let newSession = {email: customerEmail, cart: customerCart};
+        fs.writeFileSync('./token/'+customerEmail, JSON.stringify(newSession));
+        res.setHeader('Cache-Control', 'no-store');
+        res.writeHead(301, {'Location' : '/home'});
         res.end();
+    }
+
+    cart(req, res) {
+        let session = fs.readFileSync('./token/' + tokenId, 'utf8');
+        let cart = JSON.parse(session).cart;
+        let selectedProId = '';
+        for (let i = 0; i < cart.length; i++) {
+            selectedProId += `pro_id = ${cart[i]} or `
+        }
+        selectedProId = selectedProId.slice(0, -3);
+        let sql = `SELECT * FROM product WHERE ${selectedProId}`;
+        connection.connect(()=>{
+            connection.query(sql, (err, result) => {
+                let html = '';
+                result.forEach((item, i) => {
+                    html += `<tr>`;
+                    html += `<td><p>${item.name}</p></td>`;
+                    html += `<td>${item.description}</td>`;
+                    html += '<td>';
+                    html += `<form class="form-inline">`;
+                    html += `<input class="form-control" type="number" value="1" id = 'quantity${i}' onchange="money()">`
+                    html += `<a href="#" class="btn btn-primary"><i class="fa fa-trash-o"></i></a>`
+                    html += `</form>`;
+                    html += `</td>`;
+                    html += `<td><span>$</span><span id = 'price${i}'>${item.price}</span></td>`;
+                    html += `<td><span>$</span><span id = 'total${i}'>${item.price}</span></td>`
+                    html += `</tr>`
+                })
+                let data = fs.readFileSync('./templates/cart.html', "utf-8");
+                data =data.replace('{input}', html);
+                res.writeHead(200, {'Content-Type' : 'text/html'});
+                res.write(data);
+                res.end();
+            })
+        })
     }
 
     notFound(req, res) {

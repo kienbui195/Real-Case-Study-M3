@@ -58,5 +58,6 @@ values ('thogawa', 'ddtho95@gmail.com', 'Thogia123', 'admin'),
        ('Ken', 'ken@gmail.com', '123456', 'admin');
 
 INSERT INTO users(name,email,password,role)
-values ('Thứ', 'thu@gmail.com', '123456', 'customer')
+values ('Thứ', 'thu@gmail.com', '123456', 'customer');
 
+SELECT * FROM product WHERE pro_id = 8 or pro_id = 9;
