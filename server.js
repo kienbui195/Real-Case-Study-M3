@@ -51,16 +51,13 @@ const httpServer = http.createServer((req, res) => {
             controller.create(req, res);
             break;
         case '/update':
-            if (urlPath.pathname === '/update') {
-                const query = qs.parse(url.parse(req.url).query);
-                controller.update(req, res, +query.id);
-            }
+            controller.update(req, res);
             break;
         case '/delete':
-            if (urlPath.pathname === '/delete') {
-                const query = qs.parse(url.parse(req.url).query);
-                controller.delete(req, res, +query.id);
-            }
+            controller.delete(req, res);
+            break;
+        case '/search':
+            controller.searchProduct(req, res);
             break;
         default:
             controller.notFound(req, res);
