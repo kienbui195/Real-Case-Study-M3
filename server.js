@@ -1,8 +1,6 @@
 const http = require('http');
 const port = 8080;
 const url = require('url');
-const qs = require('qs');
-const {Server} = require('socket.io');
 const Controller = require("./src/js/controller");
 const fs = require("fs");
 
@@ -21,7 +19,7 @@ const httpServer = http.createServer((req, res) => {
     if (filesDefences) {
         const extension = mimeTypes[filesDefences[0].toString().split('.')[1]];
        res.writeHead(200, { 'Content-Type': extension });
-        fs.createReadStream(__dirname + "/" + req.url).pipe(res)
+        fs.createReadStream(__dirname + "/" + req.url).pipe(res);
     }
 
     const urlPath = url.parse(req.url);
@@ -68,9 +66,6 @@ const httpServer = http.createServer((req, res) => {
             break;
     }
 })
-
-
-
 
     httpServer.listen(port, 'localhost', () => {
     console.log(`Server is running at http://localhost:${port}`);
