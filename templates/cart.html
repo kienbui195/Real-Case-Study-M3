@@ -1,10 +1,113 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Giỏ hàng của bạn</title>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
+    <style>
+        .img-cart {
+            display: block;
+            max-width: 50px;
+            height: auto;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        table tr td{
+            border:1px solid #FFFFFF;
+        }
+
+        table tr th {
+            background:#eee;
+        }
+
+        .panel-shadow {
+            box-shadow: rgba(0, 0, 0, 0.3) 7px 7px 7px;
+        }
+    </style>
 </head>
 <body>
-
+<div class="container bootstrap snippets bootdey">
+    <div class="col-md-9 col-sm-8 content">
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                    <li class="active">Giỏ hàng của bạn đây, mua hàng mau đi nhé!</li>
+                </ol>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-info panel-shadow">
+                    <div class="panel-heading">
+                        <h3>
+                            <img class="img-circle img-thumbnail" src="https://bootdey.com/img/Content/user_3.jpg">
+                            Matew darfkmoun
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Mô tả</th>
+                                    <th>Số lượng</th>
+                                    <th>Giá bán lẻ</th>
+                                    <th>Tổng tiền</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><p>abc</p></td>
+                                    <td><strong>Product 1</strong></td>
+                                    <td>
+                                        <form class="form-inline">
+                                            <input class="form-control" type="number" value="1" id = 'quantity' onchange="money()">
+                                            <a href="#" class="btn btn-primary"><i class="fa fa-trash-o"></i></a>
+                                        </form>
+                                    </td>
+                                    <td><span>$</span><span id = 'price'>54</span></td>
+                                    <td><span>$</span><span id = 'total'>54</span></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-right"><strong>Total</strong></td>
+                                    <td><span>$</span><span id = 'totalorder'>88</span></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <a href="#" class="btn btn-success"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;Continue Shopping</a>
+                <a href="#" class="btn btn-primary pull-right">Check out<span class="glyphicon glyphicon-chevron-right"></span></a>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function money(){
+        console.log(document.getElementById("price").innerHTML);
+        console.log(document.getElementById("quantity").value);
+        document.getElementById("total").innerHTML = +document.getElementById("price").innerHTML * document.getElementById("quantity").value
+        document.getElementById("totalorder").innerHTML = document.getElementById("total").innerHTML
+    }
+</script>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
 </body>
 </html>
