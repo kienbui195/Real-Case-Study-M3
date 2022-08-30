@@ -22,8 +22,6 @@ class Controller {
                 connection.connect(()=>{
                     let sql = `SELECT * from users WHERE email = '${newData.email}'`;
                     connection.query(sql, (err, results) => {
-                        console.log(results[0].password);
-                        console.log(newData.password);
                         if(results.length > 0) {
                             if(results[0].role === 'admin' && results[0].password === newData.password){
                                 res.writeHead(301, {'Location': '/dashboard'})
@@ -190,7 +188,6 @@ class Controller {
             req.on('end', () => {
                 let newData = qs.parse(data);
                 connection.connect(() => {
-                    console.log(newData)
                     const sql = `INSERT INTO product (name, price, quantityInStock, description) VALUES ('${newData.nameProduct}',${+newData.priceProduct}, ${+newData.quantityProduct}, '${newData.description}')`
                     connection.query(sql, (err, result) => {
                         if (err) {
@@ -263,7 +260,6 @@ class Controller {
             connection.query(sql, (err, result) => {
                 let html = '';
                 if (result.length > 0) {
-                    console.log(result)
                     result.forEach((item, index) => {
                         html += '<tr>'
                         html += `<td>${index + 1}</td>`
