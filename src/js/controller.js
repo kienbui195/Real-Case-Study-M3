@@ -1,11 +1,11 @@
 const fs = require('fs');
-const mysql = require('mysql');
 const connection = require('../js/connecttoDatabase.js');
 const localStorage = require('local-storage');
 const qs = require("qs");
 const url = require("url");
 
 let tokenId;
+
 
 class Controller {
 
@@ -196,7 +196,7 @@ class Controller {
 
     dashboard(req, res) {
         connection.connect(() => {
-            let sql = 'SELECT * FROM product';
+            let sql = 'SELECT * FROM product;';
             connection.query(sql, (err, results) => {
                 let html = '';
                 for (let i = 0; i < results.length; i++) {
@@ -206,7 +206,7 @@ class Controller {
                     html += `<td>${results[i].price}</td>`;
                     html += `<td>${results[i].quantityInStock}</td>`;
                     html += `<td>${results[i].description}</td>`;
-                    html += `<td><a class="btn btn-success">Sửa</a></td>`
+                    html += `<td><a class="btn btn-success" href="/update?id=${results[i].pro_id}">Sửa</a></td>`
                     html += `<td><a class="btn btn-danger" href="/delete?id=${results[i].pro_id}">Xóa</a></td>`
                     html += `</tr>`;
                 }
@@ -247,7 +247,8 @@ class Controller {
         }
     }
 
-    delete(req, res, id) {
+    delete(req, res) {
+        const id = +qs.parse(url.parse(req.url).query).id;
         connection.connect(() => {
             let sql = `DELETE FROM product WHERE pro_id = ${id}`
             connection.query(sql, (err) => {
@@ -260,8 +261,76 @@ class Controller {
         })
     }
 
-    update(req, res, id) {
+    update(req, res) {
+        const id = +qs.parse(url.parse(req.url).query).id;
+        if (req.method === 'GET') {
+            connection.connect(() => {
+                let sql = `SELECT * FROM product WHERE pro_id = ${id}`
+                connection.query(sql, (err, result) => {
+                    let data = fs.readFileSync('./templates/update.html', 'utf-8')
+                    data = data.replace(`<input type="text" class="form-control" name="nameProduct" id="exampleInput" style="margin-left: 20px">`, `<input type="text" class="form-control" name="nameProduct" id="exampleInput" style="margin-left: 20px" value="${result[0].name}">`)
+                    data = data.replace(`<input type="number" class="form-control" name="priceProduct" id="exampleInputPrice" style="margin-left: 20px">`, `<input type="number" class="form-control" name="priceProduct" id="exampleInputPrice" style="margin-left: 20px" value="${result[0].price}">`)
+                    data = data.replace(`<input type="number" class="form-control" name="quantityProduct" id="exampleInputStock" style="margin-left: 20px">`, `<input type="number" class="form-control" name="quantityProduct" id="exampleInputStock" style="margin-left: 20px" value="${result[0].quantityInStock}">`)
+                    data = data.replace(`<input type="text" class="form-control" name="description" id="exampleInputBrief" style="margin-left: 20px">`, `<input type="text" class="form-control" name="description" id="exampleInputBrief" style="margin-left: 20px" value="${result[0].description}">`)
+                    res.writeHead(200, {'Content-Type' : 'text/html'})
+                    res.write(data)
+                    res.end()
+                })
+            })
+        } else {
+            let data = '';
+            req.on('data' , chunk => {
+                data += chunk;
+            })
+            req.on('end', () => {
+                connection.connect(() => {
+                    let newData = qs.parse(data);
+                    let sql = `UPDATE product SET name = '${newData.nameProduct}', price = ${+newData.priceProduct}, quantityInStock = ${+newData.quantityProduct}, description = '${newData.description}' WHERE pro_id = ${id}`
+                    connection.query(sql, (err) => {
+                        if (err) {
+                            console.log(err)
+                        }
+                    })
+                    res.writeHead(301, {'Location' :'/dashboard'})
+                    res.end()
+                })
 
+            })
+        }
+    }
+
+    searchProduct(req, res) {
+        let keyword = qs.parse(url.parse(req.url).query).keyword;
+        const sql = `SELECT * FROM product WHERE name LIKE '%${keyword}%'`
+        connection.connect(() => {
+            connection.query(sql, (err, result) => {
+                let html = '';
+                if (result.length > 0) {
+                    console.log(result)
+                    result.forEach((item, index) => {
+                        html += '<tr>'
+                        html += `<td>${index + 1}</td>`
+                        html += `<td>${item.name}</td>`
+                        html += `<td>${item.price}</td>`
+                        html += `<td>${item.quantityInStock}</td>`
+                        html += `<td>${item.description}</td>`
+                        html += `<td><a class="btn btn-success" href="/update?id=${+item.pro_id}">Sửa</a></td>`
+                        html += `<td><a class="btn btn-danger" href="/delete?id=${+item.pro_id}">Xóa</a></td>`
+                        html += '</tr>'
+                    })
+                } else {
+                    html += '<tr>'
+                    html += `<td class="text-center">Không có dữ liệu</td>`
+                    html += '</tr>'
+                }
+                let data = fs.readFileSync('./templates/dashboard.html', 'utf-8')
+                data = data.replace('{ListProduct}' , html)
+                res.writeHead(200, {'Content-Type' : 'text/html'})
+                res.write(data)
+                res.end()
+            })
+
+        })
     }
 }
 
