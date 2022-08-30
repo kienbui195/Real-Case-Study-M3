@@ -41,7 +41,6 @@ class Controller {
                             res.writeHead(301, {'Location' : '/login'})
                             res.end();
                         }
-
                     });
                 })
             })
@@ -155,8 +154,8 @@ class Controller {
                     html += `<td>${results[i].price}</td>`;
                     html += `<td>${results[i].quantityInStock}</td>`;
                     html += `<td>${results[i].description}</td>`;
-                    html += `<td><button type="button" class="btn btn-success">Sửa</button></td>`
-                    html += `<td><button type="button" class="btn btn-success">Xóa</button></td>`
+                    html += `<td><a class="btn btn-success">Sửa</a></td>`
+                    html += `<td><a class="btn btn-danger" href="/delete?id=${results[i].pro_id}">Xóa</a></td>`
                     html += `</tr>`;
                 }
                 let data = fs.readFileSync('./templates/dashboard.html', 'utf8');
@@ -166,6 +165,51 @@ class Controller {
                 res.end();
             })
         })
+    }
+
+    create(req, res) {
+        if (req.method === "GET") {
+            let data = fs.readFileSync('./templates/create.html', '')
+            res.writeHead(200, {'Content-Type' : 'text/html'});
+            res.write(data);
+            res.end();
+        } else {
+            let data = '';
+            req.on('data' , chunk => {
+                data += chunk;
+            })
+            req.on('end', () => {
+                let newData = qs.parse(data);
+                connection.connect(() => {
+                    console.log(newData)
+                    const sql = `INSERT INTO product (name, price, quantityInStock, description) VALUES ('${newData.nameProduct}',${+newData.priceProduct}, ${+newData.quantityProduct}, '${newData.description}')`
+                    connection.query(sql, (err, result) => {
+                        if (err) {
+                            console.log(err)
+                        }
+                    })
+                    res.writeHead(301, {'Location' : '/dashboard'})
+                    res.end();
+                })
+            })
+        }
+    }
+
+    delete(req, res, id) {
+        connection.connect(() => {
+            let sql = `DELETE FROM product WHERE pro_id = ${id}`
+            connection.query(sql, (err) => {
+                if (err) {
+                    console.log(err)
+                }
+            })
+            res.writeHead(301, {'Location' : '/dashboard'})
+            res.end();
+        })
+    }
+
+    update(req, res, id) {
+
     }
 }
 
