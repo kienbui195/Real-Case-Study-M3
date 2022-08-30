@@ -24,9 +24,8 @@ const httpServer = http.createServer((req, res) => {
         fs.createReadStream(__dirname + "/" + req.url).pipe(res)
     }
 
-    const path = req.url;
-
-    switch (path) {
+    const urlPath = url.parse(req.url);
+    switch (urlPath.pathname) {
         case '/':
             controller.checkSession(req, res);
             break;
@@ -47,6 +46,18 @@ const httpServer = http.createServer((req, res) => {
             break;
         case '/dashboard':
             controller.dashboard(req, res);
+            break;
+        case '/create':
+            controller.create(req, res);
+            break;
+        case '/update':
+            controller.update(req, res);
+            break;
+        case '/delete':
+            if (urlPath.pathname === '/delete') {
+                const query = qs.parse(url.parse(req.url).query);
+                controller.delete(req, res, +query.id);
+            }
             break;
         default:
             controller.notFound(req, res);
