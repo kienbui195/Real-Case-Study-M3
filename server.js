@@ -51,7 +51,10 @@ const httpServer = http.createServer((req, res) => {
             controller.create(req, res);
             break;
         case '/update':
-            controller.update(req, res);
+            if (urlPath.pathname === '/update') {
+                const query = qs.parse(url.parse(req.url).query);
+                controller.update(req, res, +query.id);
+            }
             break;
         case '/delete':
             if (urlPath.pathname === '/delete') {
