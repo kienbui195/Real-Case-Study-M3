@@ -41,50 +41,51 @@
                 </ol>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-info panel-shadow">
-                    <div class="panel-heading">
-                        <h3>
-                            <img class="img-circle img-thumbnail" src="https://bootdey.com/img/Content/user_3.jpg">
-                            Matew darfkmoun
-                        </h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th>Sản phẩm</th>
-                                    <th>Mô tả</th>
-                                    <th>Số lượng</th>
-                                    <th>Giá bán lẻ</th>
-                                    <th>Tổng tiền</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {input}
-                                <tr>
-                                    <td colspan="4" class="text-right"><strong>Total</strong></td>
-                                    <td><span>$</span><span id = 'totalorder'>88</span></td>
-                                </tr>
-                                </tbody>
-                            </table>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-info panel-shadow">
+                        <div class="panel-heading">
+                            <h3>
+                                <img class="img-circle img-thumbnail" src="https://bootdey.com/img/Content/user_3.jpg">
+                                Matew darfkmoun
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>Sản phẩm</th>
+                                        <th>Mô tả</th>
+                                        <th>Số lượng</th>
+                                        <th>Giá bán lẻ</th>
+                                        <th>Tổng tiền</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {input}
+                                    <tr>
+                                        <td colspan="4" class="text-right"><strong>Total</strong></td>
+                                        <td><span>$</span><span id = 'totalorder'>88</span></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
+                    <a href="/home" class="btn btn-success"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;Continue Shopping</a>
+                    <a href="/login" onclick="checkout()" type="submit" class="btn btn-primary pull-right">Check out<span class="glyphicon glyphicon-chevron-right"></span></a>
                 </div>
-                <a href="/home" class="btn btn-success"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;Continue Shopping</a>
-                <a href="#" class="btn btn-primary pull-right">Check out<span class="glyphicon glyphicon-chevron-right"></span></a>
             </div>
-        </div>
     </div>
 </div>
 <script>
     function money(){
-        console.log(document.getElementById("price").innerHTML);
-        console.log(document.getElementById("quantity").value);
-        document.getElementById("total").innerHTML = +document.getElementById("price").innerHTML * document.getElementById("quantity").value
-        document.getElementById("totalorder").innerHTML = document.getElementById("total").innerHTML
+        document.getElementById("total1").innerHTML = +document.getElementById("price1").innerHTML * document.getElementById("quantity1").value
+        document.getElementById("totalorder").innerHTML = document.getElementById("total1").innerHTML
+    }
+    function checkout(){
+        alert("Bạn đã mua hàng thành công! Mời bạn phắn!")
     }
 </script>
 <!-- Optional JavaScript -->

@@ -118,7 +118,7 @@ class Controller {
                     html += `<td>${item.description}</td>`;
                     html += '<td>';
                     html += `<form class="form-inline">`;
-                    html += `<input class="form-control" type="number" value="1" id = 'quantity${i}' onchange="money()">`
+                    html += `<input class="form-control" type="number" value="1" name = '${i}' id = 'quantity${i}' onchange="money()">`
                     html += `<a href="#" class="btn btn-primary"><i class="fa fa-trash-o"></i></a>`
                     html += `</form>`;
                     html += `</td>`;
@@ -134,6 +134,7 @@ class Controller {
             })
         })
     }
+
 
     notFound(req, res) {
         let data = fs.readFileSync('./templates/notFound.html', "utf-8");
