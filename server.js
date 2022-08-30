@@ -33,6 +33,9 @@ const httpServer = http.createServer((req, res) => {
         case '/home':
             controller.home(req, res);
             break;
+        case '/cart':
+            controller.cart(req, res);
+            break;
         case '/login':
             controller.login(req, res);
             break;
