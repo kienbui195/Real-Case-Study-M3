@@ -22,13 +22,15 @@ class Controller {
                 connection.connect(()=>{
                     let sql = `SELECT * from users WHERE email = '${newData.email}'`;
                     connection.query(sql, (err, results) => {
+                        console.log(results[0].password);
+                        console.log(newData.password);
                         if(results.length > 0) {
                             if(results[0].role === 'admin' && results[0].password === newData.password){
                                 res.writeHead(301, {'Location': '/dashboard'})
                                 res.end();
                             }else if(results[0].role === 'customer' && results[0].password === newData.password) {
                                 let tokenId = Date.now();
-                                let tokenSession = `{email:${newData.email}, password:${newData.password}`;
+                                let tokenSession = `{email:${newData.email}, password:${newData.password}}`;
                                 fs.writeFileSync('./token/'+tokenId, tokenSession);
                                 localStorage.set('token', tokenId);
                                 res.writeHead(301, {'Location' : '/home'})
@@ -51,7 +53,7 @@ class Controller {
         let tokenID = localStorage.get('token');
         if (tokenID) {
             let sessionString = '';
-            let session = fs.readFileSync('./templates/' + tokenID, 'utf8');
+            let session = fs.readFileSync('./token/' + tokenID, 'utf8');
             sessionString = String(session);
             this.home(req, res);
         }else{
@@ -71,7 +73,7 @@ class Controller {
                     html += `<td>${results[i].price}</td>`;
                     html += `<td>${results[i].quantityInStock}</td>`;
                     html += `<td>${results[i].description}</td>`;
-                    html += `<td><button type="button" class="btn btn-success">Thêm vào giỏ hàng</button></td>`
+                    html += `<td><a href='/proid=${results[i].pro_id}' type="button" class="btn btn-success">Thêm vào giỏ hàng</a></td>`
                     html += `</tr>`;
                 }
                 let data = fs.readFileSync('./templates/home.html', 'utf8');
@@ -81,6 +83,13 @@ class Controller {
                 res.end();
             })
         })
+    }
+
+    cart(req, res) {
+        let data = fs.readFileSync('./templates/cart.html', "utf-8");
+        res.writeHead(200, {'Content-Type' : 'text/html'});
+        res.write(data);
+        res.end();
     }
 
     notFound(req, res) {
