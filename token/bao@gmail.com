@@ -1,1 +1,1 @@
-{"email":"bao@gmail.com","cart":[3]}
+{"email":"bao@gmail.com","cart":[]}

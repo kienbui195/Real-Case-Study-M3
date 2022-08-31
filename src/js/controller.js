@@ -390,7 +390,7 @@ class Controller {
                     })
                 } else {
                     html += '<tr>'
-                    html += `<td class="text-center">Không có dữ liệu</td>`
+                    html += `<td colspan="7" class="text-center">Không có dữ liệu</td>`
                     html += '</tr>'
                 }
                 let data = fs.readFileSync('./templates/dashboard.html', 'utf-8')
