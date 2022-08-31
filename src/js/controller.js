@@ -242,20 +242,16 @@ class Controller {
     }
 
     chat(req, res, httpServer) {
-        let rooms = [];
         this.showForm('./templates/chatting.html', res)
 
         const io = new Server(httpServer);
         io.on('connection', (socket) => {
-            socket.on('adduser', (user) => {
-                let nameRoom = user;
-                socket.join(nameRoom);
-                if (nameRoom != null && rooms.indexOf(nameRoom) <0){
-                    rooms.push(nameRoom)
+            socket.on('message', (data) => {
+                let message = {
+                    name: data.name,
+                    message: data.message,
+                    time: data.time
                 }
-            })
-            socket.on('sendMessage', (messagedata) => {
-                let message = 'someone: ' + messagedata;
                 io.emit('say-message', message)
             })
         })
