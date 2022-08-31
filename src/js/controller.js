@@ -4,7 +4,10 @@ const qs = require("qs");
 const url = require("url");
 const DBConnect = require("../model/databaseModel");
 const {Server} = require("socket.io");
+const cookie = require("cookie");
 
+let checkLoginAdmin = false;
+let checkLoginUser = false;
 
 let tokenId;
 
@@ -38,68 +41,111 @@ class Controller {
         res.end();
     }
 
+    showLogin(req, res) {
+        let cookieLogin = {
+            email: '',
+            password: ''
+        }
+        if (req.headers.cookie) {
+            let cookies = cookie.parse(req.headers.cookie)
+            if (cookies && cookies.user) {
+                cookieLogin = JSON.parse(cookies.user)
+                if (cookieLogin.sessionId) {
+                    let dataSession = fs.readFileSync('./token/' + cookieLogin.sessionId + '.txt', 'utf-8' );
+                    let userCurrentLogin = JSON.parse(dataSession)
+                    if (userCurrentLogin.email === cookieLogin.email && userCurrentLogin.password === cookieLogin.password) {
+                        this.navigation(res, '/dashboard');
+                    }
+                }
+            }
+        }
+        this.showForm('./templates/login.html', res)
+    }
+
     login(req, res) {
         if (req.method === "GET") {
-            this.showForm('./templates/login.html', res);
+            this.showLogin(req, res);
         } else {
             let data = '';
             req.on('data', chunk => {
                 data += chunk;
-            });
+            })
             req.on('end', async () => {
                 let newData = qs.parse(data);
-                let sql = `SELECT * from users WHERE email = '${newData.email}'`;
+                let sql = `SELECT * FROM users`;
                 let results = await this.querySQL(sql)
-                if (results.length > 0) {
-                    if (results[0].role === 'admin' && results[0].password === newData.password) {
+                let nameFile = Date.now() + 'Login';
+                results.forEach((item, index) => {
+                    if (newData.email === item.email && newData.password === item.password && item.role === 'admin') {
+                        let dataCookie = {
+                            email: newData.email,
+                            password: newData.password,
+                            sessionId: nameFile
+                        }
+                        let sessionLogin = {
+                            email: newData.email,
+                            password: newData.password,
+                            role: 'admin'
+                        }
+                        let setCookie = cookie.serialize('user', JSON.stringify(dataCookie), {
+                            httpOnly: true,
+                            maxAge: 60*5
+                        });
+                        res.setHeader('Set-Cookie' , setCookie);
+                        fs.writeFileSync('./token/' + nameFile + '.txt', JSON.stringify(sessionLogin));
+                        checkLoginAdmin = true;
                         this.navigation(res, '/dashboard');
-                    } else if (results[0].role === 'customer' && results[0].password === newData.password) {
-                        tokenId = newData.email;
-                        let tokenSession = {email : newData.email, cart : []};
-                        fs.writeFileSync('./token/'+tokenId, JSON.stringify(tokenSession), 'utf-8');
-                        localStorage.set(`${tokenId}`, tokenId);
+                    } else if (item.email === newData.email && item.password === newData.password && item.role === 'customer') {
+                        let dataCookie = {
+                            email: newData.email,
+                            password: newData.password,
+                            sessionId: nameFile
+                        }
+                        let sessionLogin = {
+                            email: newData.email,
+                            password: newData.password,
+                            role: 'customer',
+                            cart: []
+                        }
+                        let setCookie = cookie.serialize('user', JSON.stringify(dataCookie), {
+                            httpOnly: true,
+                            maxAge: 60*5
+                        })
+                        res.setHeader('Set-Cookie', setCookie)
+                        fs.writeFileSync('./token/' + nameFile + '.txt', JSON.stringify(sessionLogin));
+                        checkLoginUser = true;
                         this.navigation(res, '/home');
-                    } else {
-                        this.navigation(res, '/login');
                     }
-                } else {
-                    this.navigation(res, '/login');
-                }
+                })
             })
         }
     }
 
-    checkSession(req, res) {
-        let tokenId = localStorage.get('token');
-        if (tokenId) {
-            this.home(req, res).then(r => {
-            });
-        } else {
-            this.login(req, res);
-        }
-    }
-
     async home(req, res) {
-        let sql = 'SELECT * FROM product';
-        let results = await this.querySQL(sql)
-        let html = '';
-        for (let i = 0; i < results.length; i++) {
-            html += `<tr>`;
-            html += `<td>${i+1}</td>`;
-            html += `<td>${results[i].name}</td>`;
-            html += `<td>${results[i].price}</td>`;
-            html += `<td>${results[i].quantityInStock}</td>`;
-            html += `<td>${results[i].description}</td>`;
-            html += `<td><a href='/add-cart?id=${results[i].pro_id}' type="button" class="btn btn-success">Thêm vào giỏ hàng</a></td>`
-            html += `</tr>`;
+        let role = this.checkCookie(req, res)
+        if (role === 'customer') {
+            let sql = 'SELECT * FROM product';
+            let results = await this.querySQL(sql)
+            let html = '';
+            for (let i = 0; i < results.length; i++) {
+                html += `<tr>`;
+                html += `<td>${i+1}</td>`;
+                html += `<td>${results[i].name}</td>`;
+                html += `<td>${results[i].price}</td>`;
+                html += `<td>${results[i].quantityInStock}</td>`;
+                html += `<td>${results[i].description}</td>`;
+                html += `<td><a href='/add-cart?id=${results[i].pro_id}' type="button" class="btn btn-success">Thêm vào giỏ hàng</a></td>`
+                html += `</tr>`;
+            }
+            let data = fs.readFileSync('./templates/home.html', 'utf-8');
+            res.setHeader('Cache-Control', 'no-store');
+            res.writeHead(200, {'Content-Type' : 'text/html'});
+            data = data.replace('{ListProduct}', html);
+            res.write(data);
+            res.end();
+        } else {
+            this.navigation(res, '/dashboard')
         }
-        let data = fs.readFileSync('./templates/home.html', 'utf-8');
-        console.log(data)
-        res.setHeader('Cache-Control', 'no-store');
-        res.writeHead(200, {'Content-Type' : 'text/html'});
-        data = data.replace('{ListProduct}', html);
-        res.write(data);
-        res.end();
     }
 
     async customerSearch(req, res){
@@ -248,7 +294,20 @@ class Controller {
         }
     }
 
+    checkCookie(req, res) {
+        if (req.headers.cookie) {
+            let currentLogin = cookie.parse(req.headers.cookie);
+            let currentUser = JSON.parse(currentLogin.user);
+            let results = fs.readFileSync('./token/' + currentUser.sessionId +'.txt', 'utf-8')
+            return JSON.parse(results).role
+        } else {
+            return 'none';
+        }
+    }
+
     async dashboard(req, res) {
+        let role = this.checkCookie(req, res)
+        if (role === 'admin') {
             let sql = 'SELECT * FROM product;';
             let results = await this.querySQL(sql);
             let html = '';
@@ -266,6 +325,9 @@ class Controller {
             res.writeHead(200, {'Content-Type' : 'text/html'});
             data = data.replace('{ListProduct}', html);res.write(data);
             res.end();
+        } else if (role === 'customer') {
+            this.navigation(res, '/home')
+        } else this.navigation(res, './login')
     }
 
     createProduct(req, res) {
