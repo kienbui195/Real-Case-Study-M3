@@ -26,10 +26,10 @@ const httpServer = http.createServer((req, res) => {
 
     switch (urlPath.pathname) {
         case '/':
-            controller.checkSession(req, res);
+            controller.login(req, res);
             break;
         case '/home':
-            controller.home(req, res).then(r => {});
+            controller.home(req, res);
             break;
         case '/add-cart':
             controller.addCart(req, res);
@@ -62,7 +62,7 @@ const httpServer = http.createServer((req, res) => {
             controller.searchProduct(req, res).then(r => {});
             break;
         case '/customer/search':
-            controller.customerSearch(req, res).then(r => {});
+            controller.customerSearch(req, res).then(r => {} );
             break;
         default:
             controller.notFound(req, res);
