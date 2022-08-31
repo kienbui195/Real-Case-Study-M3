@@ -17,8 +17,9 @@
             {User-Info}
         </div>
         <div class="col-6" style="background-color: white; height: 800px">
-            <input type="text" name="message" style="width: 85%">
-            <button type="button" onclick="clickBtn()" >Send</button>
+            <input type="text" name="message" style="width: 85%" id="message" >
+            <button type="button" onclick="sendMessage()" >Send</button>
+            <ul id = 'list-message'></ul>
         </div>
         <div class="col-3">
             {Admin-Status}
@@ -26,6 +27,21 @@
     </div>
 </div>
 
+<script src="https://cdn.socket.io/4.5.0/socket.io.min.js" crossorigin="anonymous"></script>
+<script>
+function sendMessage() {
+    let message = document.getElementById("message").value;
+    socket.emit('sendMessage', message);
+}
+
+let socket = io('http://localhost:8080');
+socket.on('say-message', (data) =>{
+    let html = '<li>' + data + '</li>';
+    document.getElementById("list-message").innerHTML += html;
+})
+
+
+</script>
 <!-- JavaScript Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
 </body>
