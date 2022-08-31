@@ -90,7 +90,7 @@ class Controller {
             html += `<td>${results[i].price}</td>`;
             html += `<td>${results[i].quantityInStock}</td>`;
             html += `<td>${results[i].description}</td>`;
-            html += `<td><a href='/addcart?id=${results[i].pro_id}' type="button" class="btn btn-success">Thêm vào giỏ hàng</a></td>`
+            html += `<td><a href='/add-cart?id=${results[i].pro_id}' type="button" class="btn btn-success">Thêm vào giỏ hàng</a></td>`
             html += `</tr>`;
         }
         let data = fs.readFileSync('./templates/home.html', 'utf-8');
@@ -117,7 +117,7 @@ class Controller {
                         html += `<td>${item.price}</td>`;
                         html += `<td>${item.quantityInStock}</td>`;
                         html += `<td>${item.description}</td>`;
-                        html += `<td><a href='/customer/addcart?id=${item.pro_id}' type="button" class="btn btn-success">Thêm vào giỏ hàng</a></td>`
+                        html += `<td><a href='/customer/add-cart?id=${item.pro_id}' type="button" class="btn btn-success">Thêm vào giỏ hàng</a></td>`
                         html += `</tr>`;
                     })
                 } else {
@@ -196,9 +196,20 @@ class Controller {
     }
 
     chat(req, res, httpServer) {
+        let rooms = [];
         this.showForm('./templates/chatting.html', res)
+
         const io = new Server(httpServer);
         io.on('connection', (socket) => {
+            socket.on('adduser', (user) => {
+                let nameRoom = user;
+                socket.join(nameRoom);
+                if (nameRoom != null && rooms.indexOf(nameRoom) <0){
+                    rooms.push(nameRoom)
+                }
+
+            })
+
             socket.on('sendMessage', (messagedata) => {
                 let message = 'someone: ' + messagedata;
                 io.emit('say-message', message)

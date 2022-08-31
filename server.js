@@ -31,7 +31,7 @@ const httpServer = http.createServer((req, res) => {
         case '/home':
             controller.home(req, res).then(r => {});
             break;
-        case '/addcart':
+        case '/add-cart':
             controller.addCart(req, res);
             break;
         case '/customer/cart':
@@ -62,7 +62,7 @@ const httpServer = http.createServer((req, res) => {
             controller.searchProduct(req, res).then(r => {});
             break;
         case '/customer/search':
-            controller.customerSearch(req, res);
+            controller.customerSearch(req, res).then(r => {});
             break;
         default:
             controller.notFound(req, res);
