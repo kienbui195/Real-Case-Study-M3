@@ -91,13 +91,13 @@
 
     socket.on('say-message', (data) => {
         let user = data.name;
-        let html = '';
+        let html ='';
         if (user === 'admin') {
             html += `<div class="container">
         <p>Admin: ${data.message}</p>
         <span class="time-right">${data.time}</span>
     </div>`;
-        } else {
+        }else{
             html += `<div class="container darker">
         <p>${data.name} : ${data.message}</p>
         <span class="time-left">${data.time}</span>
