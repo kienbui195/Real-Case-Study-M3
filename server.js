@@ -31,10 +31,10 @@ const httpServer = http.createServer((req, res) => {
         case '/home':
             controller.home(req, res);
             break;
-        case '/addcart':
+        case '/customer/addcart':
             controller.addCart(req, res);
             break;
-        case '/cart':
+        case '/customer/cart':
             controller.cart(req, res);
             break;
         case '/login':
@@ -44,7 +44,7 @@ const httpServer = http.createServer((req, res) => {
             controller.register(req, res);
             break;
         case '/chat':
-            controller.chat(req, res);
+            controller.chat(req, res, httpServer);
             break;
         case '/dashboard':
             controller.dashboard(req, res);
@@ -61,13 +61,16 @@ const httpServer = http.createServer((req, res) => {
         case '/search':
             controller.searchProduct(req, res);
             break;
+        case '/customer/search':
+            controller.customerSearch(req, res);
+            break;
         default:
             controller.notFound(req, res);
             break;
     }
 })
 
-    httpServer.listen(port, 'localhost', () => {
+httpServer.listen(port, 'localhost', () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
 
