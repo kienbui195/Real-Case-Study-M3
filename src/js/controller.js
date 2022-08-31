@@ -181,7 +181,6 @@ class Controller {
         }
     }
 
-
     notFound(req, res) {
         let data = fs.readFileSync('./templates/notFound.html', "utf-8");
         res.writeHead(200, {'Content-Type': 'text/html'});
@@ -195,8 +194,19 @@ class Controller {
         res.write(data);
         res.end();
 
+        let rooms = [];
+
         const io = new Server(httpServer);
         io.on('connection', (socket) => {
+            socket.on('adduser', (user) => {
+                let nameRoom = user;
+                socket.join(nameRoom);
+                if (nameRoom != null && rooms.indexOf(nameRoom) <0){
+                    rooms.push(nameRoom)
+                }
+
+            })
+
             socket.on('sendMessage', (messagedata) => {
                 let message = 'someone: ' + messagedata;
                 io.emit('say-message', message)
