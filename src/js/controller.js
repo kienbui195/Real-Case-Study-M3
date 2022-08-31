@@ -6,11 +6,6 @@ const DBConnect = require("../model/databaseModel");
 const {Server} = require("socket.io");
 const cookie = require("cookie");
 
-let checkLoginAdmin = false;
-let checkLoginUser = false;
-
-let tokenId;
-
 class Controller {
 
     constructor() {
@@ -74,7 +69,7 @@ class Controller {
                 let newData = qs.parse(data);
                 let sql = `SELECT * FROM users`;
                 let results = await this.querySQL(sql)
-                let nameFile = Date.now() + 'Login';
+                let nameFile = newData.email;
                 results.forEach((item, index) => {
                     if (newData.email === item.email && newData.password === item.password && item.role === 'admin') {
                         let dataCookie = {
@@ -84,7 +79,6 @@ class Controller {
                         }
                         let sessionLogin = {
                             email: newData.email,
-                            password: newData.password,
                             role: 'admin'
                         }
                         let setCookie = cookie.serialize('user', JSON.stringify(dataCookie), {
@@ -93,7 +87,6 @@ class Controller {
                         });
                         res.setHeader('Set-Cookie' , setCookie);
                         fs.writeFileSync('./token/' + nameFile + '.txt', JSON.stringify(sessionLogin));
-                        checkLoginAdmin = true;
                         this.navigation(res, '/dashboard');
                     } else if (item.email === newData.email && item.password === newData.password && item.role === 'customer') {
                         let dataCookie = {
@@ -103,7 +96,6 @@ class Controller {
                         }
                         let sessionLogin = {
                             email: newData.email,
-                            password: newData.password,
                             role: 'customer',
                             cart: []
                         }
@@ -113,7 +105,6 @@ class Controller {
                         })
                         res.setHeader('Set-Cookie', setCookie)
                         fs.writeFileSync('./token/' + nameFile + '.txt', JSON.stringify(sessionLogin));
-                        checkLoginUser = true;
                         this.navigation(res, '/home');
                     }
                 })
@@ -179,24 +170,34 @@ class Controller {
     }
 
     addCart(req, res) {
-        let session = fs.readFileSync('./token/' + tokenId, 'utf8');
-        let customerEmail = JSON.parse(session).email;
-        let customerCart = JSON.parse(session).cart;
+        let dataSession = this.getDataSession(req);
+        let customerEmail = dataSession.email;
+        let customerCart = dataSession.cart;
         let query = qs.parse(url.parse(req.url).query);
         let productID = +query.id;
         if (customerCart.indexOf(productID) === -1) {
             customerCart.push(productID);
         }
-        let newSession = {email: customerEmail, cart: customerCart};
-        fs.writeFileSync('./token/' + customerEmail, JSON.stringify(newSession));
+        let newSession = {
+            email: customerEmail,
+            role: 'customer',
+            cart: customerCart};
+        fs.writeFileSync('./token/' + currentUser.sessionId +'.txt', JSON.stringify(newSession));
         res.setHeader('Cache-Control', 'no-store');
         res.writeHead(301, {'Location': '/home'});
         res.end();
     }
 
+    getDataSession(req) {
+        let currentLogin = cookie.parse(req.headers.cookie);
+        let currentUser = JSON.parse(currentLogin.user);
+        let results = fs.readFileSync('./token/' + currentUser.sessionId + '.txt', 'utf-8');
+        return JSON.parse(results);
+    }
+
     async cart(req, res) {
-        let session = fs.readFileSync('./token/' + tokenId, 'utf8');
-        let cart = JSON.parse(session).cart;
+        let dataSession = this.getDataSession(req);
+        let cart = dataSession.cart;
         if (cart.length > 0) {
             let selectedProId = '';
             for (let i = 0; i < cart.length; i++) {
@@ -292,10 +293,8 @@ class Controller {
 
     checkCookie(req, res) {
         if (req.headers.cookie) {
-            let currentLogin = cookie.parse(req.headers.cookie);
-            let currentUser = JSON.parse(currentLogin.user);
-            let results = fs.readFileSync('./token/' + currentUser.sessionId +'.txt', 'utf-8')
-            return JSON.parse(results).role
+            let dataSession = this.getDataSession(req);
+            return dataSession.role
         } else {
             return 'none';
         }
@@ -322,8 +321,8 @@ class Controller {
             data = data.replace('{ListProduct}', html);res.write(data);
             res.end();
         } else if (role === 'customer') {
-            this.navigation(res, '/home')
-        } else this.navigation(res, './login')
+            this.navigation(res, '/home');
+        } else this.navigation(res, './login');
     }
 
     createProduct(req, res) {
