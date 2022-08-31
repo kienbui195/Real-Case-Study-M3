@@ -29,13 +29,13 @@ const httpServer = http.createServer((req, res) => {
             controller.checkSession(req, res);
             break;
         case '/home':
-            controller.home(req, res);
+            controller.home(req, res).then(r => {});
             break;
-        case '/customer/addcart':
+        case '/addcart':
             controller.addCart(req, res);
             break;
         case '/customer/cart':
-            controller.cart(req, res);
+            controller.cart(req, res).then(r => {});
             break;
         case '/login':
             controller.login(req, res);
@@ -47,19 +47,19 @@ const httpServer = http.createServer((req, res) => {
             controller.chat(req, res, httpServer);
             break;
         case '/dashboard':
-            controller.dashboard(req, res);
+            controller.dashboard(req, res).then(r => {});
             break;
-        case '/create':
-            controller.create(req, res);
+        case '/admin/create':
+            controller.createProduct(req, res);
             break;
-        case '/update':
-            controller.update(req, res);
+        case '/admin/update':
+            controller.updateProduct(req, res).then(r => {});
             break;
-        case '/delete':
-            controller.delete(req, res);
+        case '/admin/delete':
+            controller.deleteProduct(req, res).then(r => {});
             break;
-        case '/search':
-            controller.searchProduct(req, res);
+        case '/admin/search':
+            controller.searchProduct(req, res).then(r => {});
             break;
         case '/customer/search':
             controller.customerSearch(req, res);
