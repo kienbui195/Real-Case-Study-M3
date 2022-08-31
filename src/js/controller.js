@@ -3,6 +3,8 @@ const localStorage = require('local-storage');
 const qs = require("qs");
 const url = require("url");
 const DBConnect = require("../model/databaseModel");
+const {Server} = require("socket.io");
+
 
 let tokenId;
 
@@ -41,7 +43,7 @@ class Controller {
             this.showForm('./templates/login.html', res);
         } else {
             let data = '';
-            req.on('data' , chunk => {
+            req.on('data', chunk => {
                 data += chunk;
             });
             req.on('end', async () => {
@@ -100,60 +102,108 @@ class Controller {
         res.end();
     }
 
-    addCart(req, res){
+    async customerSearch(req, res){
+        let keyword = qs.parse(url.parse(req.url).query).keyword;
+        const sql = `SELECT *
+                     FROM product
+                     WHERE name LIKE '%${keyword}%'`
+        let result = await this.querySQL(sql);
+                let html = '';
+                if (result.length > 0) {
+                    result.forEach((item, i) => {
+                        html += `<tr>`;
+                        html += `<td>${i + 1}</td>`;
+                        html += `<td>${item.name}</td>`;
+                        html += `<td>${item.price}</td>`;
+                        html += `<td>${item.quantityInStock}</td>`;
+                        html += `<td>${item.description}</td>`;
+                        html += `<td><a href='/customer/addcart?id=${item.pro_id}' type="button" class="btn btn-success">Thêm vào giỏ hàng</a></td>`
+                        html += `</tr>`;
+                    })
+                } else {
+                    html += '<tr>'
+                    html += `<td class="text-center">Không có dữ liệu</td>`
+                    html += '</tr>'
+                }
+                let data = fs.readFileSync('./templates/home.html', 'utf-8')
+                data = data.replace('{ListProduct}', html)
+                res.writeHead(200, {'Content-Type': 'text/html'})
+                res.write(data)
+                res.end()
+    }
+
+    addCart(req, res) {
         let session = fs.readFileSync('./token/' + tokenId, 'utf8');
         let customerEmail = JSON.parse(session).email;
         let customerCart = JSON.parse(session).cart;
         let query = qs.parse(url.parse(req.url).query);
         let productID = +query.id;
-        if(customerCart.indexOf(productID) === -1){
+        if (customerCart.indexOf(productID) === -1) {
             customerCart.push(productID);
         }
         let newSession = {email: customerEmail, cart: customerCart};
-        fs.writeFileSync('./token/'+customerEmail, JSON.stringify(newSession));
+        fs.writeFileSync('./token/' + customerEmail, JSON.stringify(newSession));
         res.setHeader('Cache-Control', 'no-store');
-        res.writeHead(301, {'Location' : '/home'});
+        res.writeHead(301, {'Location': '/home'});
         res.end();
     }
 
     async cart(req, res) {
         let session = fs.readFileSync('./token/' + tokenId, 'utf8');
         let cart = JSON.parse(session).cart;
-        let selectedProId = '';
-        for (let i = 0; i < cart.length; i++) {
-            selectedProId += `pro_id = ${cart[i]} or `
+        if (cart.length > 0) {
+            let selectedProId = '';
+            for (let i = 0; i < cart.length; i++) {
+                selectedProId += `pro_id = ${cart[i]} or `
+            }
+            selectedProId = selectedProId.slice(0, -3);
+            let sql = `SELECT *
+                       FROM product
+                       WHERE ${selectedProId}`;
+            let html = '';
+            let result = await this.querySQL(sql)
+            result.forEach((item, i) => {
+                html += `<tr>`;
+                html += `<td><p>${item.name}</p></td>`;
+                html += `<td>${item.description}</td>`;
+                html += '<td>';
+                html += `<form class="form-inline">`;
+                html += `<input class="form-control" type="number" value="1" name = '${i}' id = 'quantity${i}' onchange="money()">`
+                html += `<a href="#" class="btn btn-primary"><i class="fa fa-trash-o"></i></a>`
+                html += `</form>`;
+                html += `</td>`;
+                html += `<td><span>$</span><span id = 'price${i}'>${item.price}</span></td>`;
+                html += `<td><span>$</span><span id = 'total${i}'>${item.price}</span></td>`
+                html += `</tr>`
+            });
+            let data = fs.readFileSync('./templates/cart.html', "utf-8");
+            data = data.replace('{input}', html);
+            res.writeHead(200, {'Content-Type': 'text/html'});
+            res.write(data);
+            res.end();
+        } else {
+            let html = `<tr>Bạn chưa có  sản phẩm nào trong giỏ hàng</tr>`;
+            let data = fs.readFileSync('./templates/cart.html', "utf-8");
+            data = data.replace('{input}', html);
+            res.writeHead(200, {'Content-Type': 'text/html'});
+            res.write(data);
+            res.end();
         }
-        selectedProId = selectedProId.slice(0, -3);
-        let sql = `SELECT * FROM product WHERE ${selectedProId}`;
-        let result = await this.querySQL(sql)
-        let html = '';
-        result.forEach((item, i) => {
-            html += `<tr>`;
-            html += `<td><p>${item.name}</p></td>`;
-            html += `<td>${item.description}</td>`;
-            html += '<td>';
-            html += `<form class="form-inline">`;
-            html += `<input class="form-control" type="number" value="1" name = '${i}' id = 'quantity${i}' onchange="money()">`
-            html += `<a href="#" class="btn btn-primary"><i class="fa fa-trash-o"></i></a>`
-            html += `</form>`;
-            html += `</td>`;
-            html += `<td><span>$</span><span id = 'price${i}'>${item.price}</span></td>`;
-            html += `<td><span>$</span><span id = 'total${i}'>${item.price}</span></td>`
-            html += `</tr>`
-        })
-        let data = fs.readFileSync('./templates/cart.html', "utf-8");
-        data = data.replace('{input}', html);
-        res.writeHead(200, {'Content-Type' : 'text/html'});
-        res.write(data);
-        res.end();
     }
 
     notFound(req, res) {
         this.showForm('./templates/notFound.html', res);
     }
 
-    chat(req, res) {
+    chat(req, res, httpServer) {
         this.showForm('./templates/chatting.html', res)
+        const io = new Server(httpServer);
+        io.on('connection', (socket) => {
+            socket.on('sendMessage', (messagedata) => {
+                let message = 'someone: ' + messagedata;
+                io.emit('say-message', message)
+            })
+        })
     }
 
     register(req, res) {
@@ -161,7 +211,7 @@ class Controller {
             this.showForm('./templates/register.html', res);
         } else {
             let data = "";
-            req.on('data' , chunk => {
+            req.on('data', chunk => {
                 data += chunk;
             });
             req.on('end' , async () => {
@@ -214,7 +264,7 @@ class Controller {
             this.showForm('./templates/create.html', res);
         } else {
             let data = '';
-            req.on('data' , chunk => {
+            req.on('data', chunk => {
                 data += chunk;
             })
             req.on('end', async () => {
@@ -248,18 +298,22 @@ class Controller {
             res.end()
         } else {
             let data = '';
-            req.on('data' , chunk => {
+            req.on('data', chunk => {
                 data += chunk;
             })
             req.on('end', async () => {
                 let newData = qs.parse(data);
-                let sql = `UPDATE product SET name = '${newData.nameProduct}', price = ${+newData.priceProduct}, quantityInStock = ${+newData.quantityProduct}, description = '${newData.description}' WHERE pro_id = ${id}`
+                let sql = `UPDATE product
+                           SET name            = '${newData.nameProduct}',
+                               price           = ${+newData.priceProduct},
+                               quantityInStock = ${+newData.quantityProduct},
+                               description     = '${newData.description}'
+                           WHERE pro_id = ${id}`
                 await this.querySQL(sql);
-                res.writeHead(301, {'Location' :'/dashboard'})
-                res.end()
-                })
-            }
+                this.navigation(res, '/dashboard');
+            })
         }
+    }
 
     async searchProduct(req, res) {
         let keyword = qs.parse(url.parse(req.url).query).keyword;
