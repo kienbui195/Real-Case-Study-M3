@@ -1,5 +1,5 @@
 const http = require('http');
-const port = 8080;
+const port = 3000;
 const url = require('url');
 const Controller = require("./src/js/controller");
 const fs = require("fs");
