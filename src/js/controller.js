@@ -170,7 +170,8 @@ class Controller {
     }
 
     addCart(req, res) {
-        let dataSession = this.getDataSession(req);
+        let sessionId = this.getSessionID(req)
+        let dataSession = this.getDataSession(sessionId);
         let customerEmail = dataSession.email;
         let customerCart = dataSession.cart;
         let query = qs.parse(url.parse(req.url).query);
@@ -182,21 +183,26 @@ class Controller {
             email: customerEmail,
             role: 'customer',
             cart: customerCart};
-        fs.writeFileSync('./token/' + currentUser.sessionId +'.txt', JSON.stringify(newSession));
+        fs.writeFileSync('./token/' + sessionId +'.txt', JSON.stringify(newSession));
         res.setHeader('Cache-Control', 'no-store');
         res.writeHead(301, {'Location': '/home'});
         res.end();
     }
 
-    getDataSession(req) {
+    getSessionID(req) {
         let currentLogin = cookie.parse(req.headers.cookie);
         let currentUser = JSON.parse(currentLogin.user);
-        let results = fs.readFileSync('./token/' + currentUser.sessionId + '.txt', 'utf-8');
+        return currentUser.sessionId
+    }
+
+    getDataSession(sessionId) {
+        let results = fs.readFileSync('./token/' + sessionId + '.txt', 'utf-8');
         return JSON.parse(results);
     }
 
     async cart(req, res) {
-        let dataSession = this.getDataSession(req);
+        let sessionId = this.getSessionID(req)
+        let dataSession = this.getDataSession(sessionId);
         let cart = dataSession.cart;
         if (cart.length > 0) {
             let selectedProId = '';
@@ -208,6 +214,7 @@ class Controller {
                        FROM product
                        WHERE ${selectedProId}`;
             let html = '';
+            let totalOrder = 0;
             let result = await this.querySQL(sql)
             result.forEach((item, i) => {
                 html += `<tr>`;
@@ -222,15 +229,19 @@ class Controller {
                 html += `<td><span>$</span><span id = 'price${i}'>${item.price}</span></td>`;
                 html += `<td><span>$</span><span id = 'total${i}'>${item.price}</span></td>`
                 html += `</tr>`
+                totalOrder += item.price
             });
             let data = fs.readFileSync('./templates/cart.html', "utf-8");
             data = data.replace('{input}', html);
+            data = data.replace('{user-email', dataSession.email);
+            data = data.replace('{totalOrder}', totalOrder)
             res.writeHead(200, {'Content-Type': 'text/html'});
             res.write(data);
             res.end();
         } else {
             let html = `<tr>Bạn chưa có  sản phẩm nào trong giỏ hàng</tr>`;
             let data = fs.readFileSync('./templates/cart.html', "utf-8");
+            data = data.replace('{user-email}', dataSession.email);
             data = data.replace('{input}', html);
             res.writeHead(200, {'Content-Type': 'text/html'});
             res.write(data);
@@ -293,7 +304,8 @@ class Controller {
 
     checkCookie(req, res) {
         if (req.headers.cookie) {
-            let dataSession = this.getDataSession(req);
+            let sessionId = this.getSessionID(req)
+            let dataSession = this.getDataSession(sessionId);
             return dataSession.role
         } else {
             return 'none';
