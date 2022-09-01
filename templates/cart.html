@@ -47,7 +47,7 @@
                         <div class="panel-heading">
                             <h3>
                                 <img class="img-circle img-thumbnail" src="https://bootdey.com/img/Content/user_3.jpg">
-                                Matew darfkmoun
+                                Chào mừng {user-email}
                             </h3>
                         </div>
                         <div class="panel-body">
@@ -66,7 +66,7 @@
                                     {input}
                                     <tr>
                                         <td colspan="4" class="text-right"><strong>Total</strong></td>
-                                        <td><span>$</span><span id = 'totalorder'>88</span></td>
+                                        <td><span>$</span><span id = 'totalOrder'>{totalOrder}</span></td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -80,9 +80,21 @@
     </div>
 </div>
 <script>
+    function findNumberOfProduct() {
+        let index = 0;
+        while(document.getElementById(`total${index}`)){
+            index ++
+        }
+        return index;
+    }
+    let numberOfProduct = findNumberOfProduct();
     function money(){
-        document.getElementById("total1").innerHTML = +document.getElementById("price1").innerHTML * document.getElementById("quantity1").value
-        document.getElementById("totalorder").innerHTML = document.getElementById("total1").innerHTML
+        let totalOrder = 0;
+        for(let i=0; i<numberOfProduct; i++) {
+            document.getElementById(`total${i}`).innerHTML = +document.getElementById(`price${i}`).innerHTML * document.getElementById(`quantity${i}`).value;
+            totalOrder += +document.getElementById(`total${i}`).innerHTML;
+        }
+        document.getElementById('totalOrder').innerHTML = totalOrder;
     }
     function checkout(){
         alert("Bạn đã mua hàng thành công! Mời bạn phắn!")
