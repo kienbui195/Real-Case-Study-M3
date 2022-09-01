@@ -1,5 +1,4 @@
 const fs = require('fs');
-const localStorage = require('local-storage');
 const qs = require("qs");
 const url = require("url");
 const DBConnect = require("../model/databaseModel");
@@ -70,7 +69,7 @@ class Controller {
                 let sql = `SELECT * FROM users`;
                 let results = await this.querySQL(sql)
                 let nameFile = newData.email;
-                results.forEach((item, index) => {
+                results.forEach(item => {
                     if (newData.email === item.email && newData.password === item.password && item.role === 'admin') {
                         let dataCookie = {
                             email: newData.email,
@@ -302,7 +301,7 @@ class Controller {
         }
     }
 
-    checkCookie(req, res) {
+    checkCookie(req) {
         if (req.headers.cookie) {
             let sessionId = this.getSessionID(req)
             let dataSession = this.getDataSession(sessionId);
@@ -330,7 +329,8 @@ class Controller {
             }
             let data = fs.readFileSync('./templates/dashboard.html', 'utf8');
             res.writeHead(200, {'Content-Type' : 'text/html'});
-            data = data.replace('{ListProduct}', html);res.write(data);
+            data = data.replace('{ListProduct}', html);
+            res.write(data);
             res.end();
         } else if (role === 'customer') {
             this.navigation(res, '/home');
@@ -359,7 +359,7 @@ class Controller {
         let sql = `DELETE FROM product WHERE pro_id = ${id}`;
         await this.querySQL(sql);
         this.navigation(res, '/dashboard');
-    }
+    }   
 
     async updateProduct(req, res) {
         const id = +qs.parse(url.parse(req.url).query).id;
