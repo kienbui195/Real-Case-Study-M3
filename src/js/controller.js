@@ -348,7 +348,7 @@ class Controller {
         let sql = `DELETE FROM product WHERE pro_id = ${id}`;
         await this.querySQL(sql);
         this.navigation(res, '/dashboard');
-    }
+    }   
 
     async updateProduct(req, res) {
         const id = +qs.parse(url.parse(req.url).query).id;
