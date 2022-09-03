@@ -257,7 +257,14 @@ class Controller {
         this.showForm('./templates/chatting.html', res)
 
         const io = new Server(httpServer);
+
         io.on('connection', (socket) => {
+            let nameUser = ''
+
+            socket.on('user-joined', (user) => {
+                nameUser = user
+            });
+
             socket.on('message', (data) => {
                 let message = {
                     name: data.name,
@@ -265,6 +272,11 @@ class Controller {
                     time: data.time
                 }
                 io.emit('say-message', message)
+            });
+
+            socket.on('disconnect', () => {
+                let message = nameUser + " disconnected"
+                socket.broadcast.emit('user-disconnect', message)
             })
         })
     }
