@@ -1,5 +1,4 @@
 const fs = require('fs');
-const localStorage = require('local-storage');
 const qs = require("qs");
 const url = require("url");
 const DBConnect = require("../model/databaseModel");
@@ -67,47 +66,53 @@ class Controller {
             })
             req.on('end', async () => {
                 let newData = qs.parse(data);
-                let sql = `SELECT * FROM users`;
+                let sql = `SELECT * FROM users WHERE email = '${newData.email}'`;
                 let results = await this.querySQL(sql)
                 let nameFile = newData.email;
-                results.forEach((item, index) => {
-                    if (newData.email === item.email && newData.password === item.password && item.role === 'admin') {
-                        let dataCookie = {
-                            email: newData.email,
-                            password: newData.password,
-                            sessionId: nameFile
+                if (results.length > 0) {
+                    results.forEach(item => {
+                        if (newData.email === item.email && newData.password === item.password && item.role === 'admin') {
+                            let dataCookie = {
+                                email: newData.email,
+                                password: newData.password,
+                                sessionId: nameFile
+                            }
+                            let sessionLogin = {
+                                email: newData.email,
+                                role: 'admin'
+                            }
+                            let setCookie = cookie.serialize('user', JSON.stringify(dataCookie), {
+                                httpOnly: true,
+                                maxAge: 60*10
+                            });
+                            res.setHeader('Set-Cookie' , setCookie);
+                            fs.writeFileSync('./token/' + nameFile + '.txt', JSON.stringify(sessionLogin));
+                            this.navigation(res, '/dashboard');
+                        } else if (item.email === newData.email && item.password === newData.password && item.role === 'customer') {
+                            let dataCookie = {
+                                email: newData.email,
+                                password: newData.password,
+                                sessionId: nameFile
+                            }
+                            let sessionLogin = {
+                                email: newData.email,
+                                role: 'customer',
+                                cart: []
+                            }
+                            let setCookie = cookie.serialize('user', JSON.stringify(dataCookie), {
+                                httpOnly: true,
+                                maxAge: 60*10
+                            })
+                            res.setHeader('Set-Cookie', setCookie)
+                            fs.writeFileSync('./token/' + nameFile + '.txt', JSON.stringify(sessionLogin));
+                            this.navigation(res, '/home');
+                        } else if (newData.password !== item.password) {
+                            this.navigation(res, '/login')
                         }
-                        let sessionLogin = {
-                            email: newData.email,
-                            role: 'admin'
-                        }
-                        let setCookie = cookie.serialize('user', JSON.stringify(dataCookie), {
-                            httpOnly: true,
-                            maxAge: 60*5
-                        });
-                        res.setHeader('Set-Cookie' , setCookie);
-                        fs.writeFileSync('./token/' + nameFile + '.txt', JSON.stringify(sessionLogin));
-                        this.navigation(res, '/dashboard');
-                    } else if (item.email === newData.email && item.password === newData.password && item.role === 'customer') {
-                        let dataCookie = {
-                            email: newData.email,
-                            password: newData.password,
-                            sessionId: nameFile
-                        }
-                        let sessionLogin = {
-                            email: newData.email,
-                            role: 'customer',
-                            cart: []
-                        }
-                        let setCookie = cookie.serialize('user', JSON.stringify(dataCookie), {
-                            httpOnly: true,
-                            maxAge: 60*5
-                        })
-                        res.setHeader('Set-Cookie', setCookie)
-                        fs.writeFileSync('./token/' + nameFile + '.txt', JSON.stringify(sessionLogin));
-                        this.navigation(res, '/home');
-                    }
-                })
+                    })
+                } else {
+                    this.navigation(res, '/login');
+                }
             })
         }
     }
@@ -314,7 +319,7 @@ class Controller {
         }
     }
 
-    checkCookie(req, res) {
+    checkCookie(req) {
         if (req.headers.cookie) {
             let sessionId = this.getSessionID(req)
             let dataSession = this.getDataSession(sessionId);
@@ -342,7 +347,8 @@ class Controller {
             }
             let data = fs.readFileSync('./templates/dashboard.html', 'utf8');
             res.writeHead(200, {'Content-Type' : 'text/html'});
-            data = data.replace('{ListProduct}', html);res.write(data);
+            data = data.replace('{ListProduct}', html);
+            res.write(data);
             res.end();
         } else if (role === 'customer') {
             this.navigation(res, '/home');
@@ -371,7 +377,7 @@ class Controller {
         let sql = `DELETE FROM product WHERE pro_id = ${id}`;
         await this.querySQL(sql);
         this.navigation(res, '/dashboard');
-    }
+    }   
 
     async updateProduct(req, res) {
         const id = +qs.parse(url.parse(req.url).query).id;

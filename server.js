@@ -29,7 +29,7 @@ const httpServer = http.createServer((req, res) => {
             controller.login(req, res);
             break;
         case '/home':
-            controller.home(req, res);
+            controller.home(req, res).then(r => {});
             break;
         case '/add-cart':
             controller.addCart(req, res);
