@@ -71,7 +71,7 @@
 
 <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" crossorigin="anonymous"></script>
 <script>
-    let socket = io('http://localhost:8080');
+    let socket = io('http://localhost:3000');
     let user = prompt('Nhập tên bán muốn sử dụng')
 
     function sendMessage() {
@@ -105,6 +105,7 @@
         }
         document.getElementById("list-message").innerHTML += html;
     })
+
 </script>
 <!-- JavaScript Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
