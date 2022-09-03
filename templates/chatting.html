@@ -69,10 +69,12 @@
 
 </div>
 
-<script src="https://cdn.socket.io/4.5.0/socket.io.min.js" crossorigin="anonymous"></script>
+<script src="./socket.io/socket.io.js"></script>
 <script>
     let socket = io('http://localhost:3000');
     let user = prompt('Nhập tên bán muốn sử dụng')
+
+    socket.emit('user-joined', user)
 
     function sendMessage() {
         let message = document.getElementById("message").value;
@@ -104,6 +106,13 @@
     </div>`
         }
         document.getElementById("list-message").innerHTML += html;
+    })
+
+    socket.on('user-disconnect', (data) => {
+        let html = `<div class="container darker">
+        <p>${data}</p>
+    </div>`
+        document.getElementById('list-message').innerHTML += html;
     })
 
 </script>
